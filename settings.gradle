@@ -1,0 +1,3 @@
+include ':TaskManager'
+include ':app'
+rootProject.name = "Tasks"
