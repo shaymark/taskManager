@@ -12,6 +12,6 @@ class TasksApplication : Application() {
         super.onCreate()
         TaskManagerApi.initApi(this)
 
-        TaskManagerApi.addDefaultCallAfterSmsTask("+972546187418", "+972546187418", "call home gate", 20000)
+       // TaskManagerApi.addDefaultCallAfterSmsTask("+972542544581", "+972545352473", "call home gate", 20000)
     }
 }

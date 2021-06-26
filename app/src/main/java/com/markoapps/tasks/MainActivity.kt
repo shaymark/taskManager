@@ -1,8 +1,12 @@
 package com.markoapps.tasks
 
 import android.Manifest
+import android.annotation.TargetApi
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.provider.Settings
 import android.view.Menu
@@ -26,13 +30,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         requestMultiplePermissionLauncher.launch(
-            arrayOf(
-                Manifest.permission.ANSWER_PHONE_CALLS,
-                Manifest.permission.CALL_PHONE,
-                Manifest.permission.RECEIVE_SMS,
-                Manifest.permission.READ_SMS,
-                Manifest.permission.SYSTEM_ALERT_WINDOW
-            )
+                arrayOf(
+                        Manifest.permission.ANSWER_PHONE_CALLS,
+                        Manifest.permission.CALL_PHONE,
+                        Manifest.permission.RECEIVE_SMS,
+                        Manifest.permission.READ_SMS,
+                        Manifest.permission.SYSTEM_ALERT_WINDOW
+                )
         )
     }
 
@@ -54,7 +58,7 @@ class MainActivity : AppCompatActivity() {
     
     val requestMultiplePermissionLauncher =
         registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
+                ActivityResultContracts.RequestMultiplePermissions()
         ) { isGranted: Map<String, Boolean> ->
             if (isGranted[Manifest.permission.ANSWER_PHONE_CALLS] == false) {
 
@@ -78,10 +82,18 @@ class MainActivity : AppCompatActivity() {
             }
 
             if (isGranted[Manifest.permission.SYSTEM_ALERT_WINDOW] == false) {
-                val myIntent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
-                startActivity(myIntent)
+                if(!isSystemAlertPermissionGranted((this))) {
+                    val myIntent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:$packageName"))
+                    startActivity(myIntent)
+                }
+
             } else {
 
             }
+        }
+
+        @TargetApi(VERSION_CODES.M)
+        fun isSystemAlertPermissionGranted(context: Context?): Boolean {
+            return VERSION.SDK_INT < VERSION_CODES.M || Settings.canDrawOverlays(context)
         }
 }
