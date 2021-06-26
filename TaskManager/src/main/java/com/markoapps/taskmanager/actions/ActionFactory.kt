@@ -17,7 +17,7 @@ class ActionFactory(
     }
 
     fun createGeneralDelayAction(delay: Long) : GeneralDelayAction {
-        return GeneralDelayAction(generalManager, delay)
+        return GeneralDelayAction(delay, generalManager)
     }
 
 }

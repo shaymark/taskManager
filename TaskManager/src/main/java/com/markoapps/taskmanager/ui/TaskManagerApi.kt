@@ -2,11 +2,18 @@ package com.markoapps.taskmanager.ui
 
 import android.content.Context
 import android.content.IntentFilter
+import com.markoapps.taskmanager.actions.Action
+import com.markoapps.taskmanager.actions.CallNumberAction
+import com.markoapps.taskmanager.actions.CallStopAction
+import com.markoapps.taskmanager.actions.GeneralDelayAction
 import com.markoapps.taskmanager.di.Provider
 import com.markoapps.taskmanager.managers.SMSBroadcastReceiver
+import com.markoapps.taskmanager.models.TasksDatabase
 import com.markoapps.taskmanager.tasks.Task
 import com.markoapps.taskmanager.triggers.SmsFilter
 import com.markoapps.taskmanager.triggers.SmsTrigger
+import com.markoapps.taskmanager.triggers.Trigger
+import models.*
 
 object TaskManagerApi {
 
@@ -17,6 +24,31 @@ object TaskManagerApi {
 //        val intentFilter = IntentFilter()
 //        intentFilter.addAction("android.provider.Telephony.SMS_RECEIVED")
 //        context.registerReceiver(SMSBroadcastReceiver(), intentFilter)
+
+        initTaskFromDb(Provider.tasksDatabase)
+    }
+
+    fun getTaskList(): List<TaskModel> {
+        return Provider.tasksDatabase.tasksDao().getAllTask()
+    }
+
+    fun updateOrAddTask(task: TaskModel) {
+        Provider.tasksDatabase.tasksDao().addTask(task)
+        Provider.TaskSchandler.addTask(task)
+    }
+
+    fun removeTask(task: TaskModel) {
+        Provider.tasksDatabase.tasksDao().deleteTask(task)
+    }
+
+    private fun initTaskFromDb(tasksDatabase: TasksDatabase) {
+        Provider.executors.execute {
+            val taskModelList = tasksDatabase.tasksDao().getAllActiveTasks()
+
+            taskModelList.forEach {
+                Provider.TaskSchandler.addTask(it)
+            }
+        }
     }
 
     fun addDefaultCallAfterSmsTask(callNumber: String, smsFrom: String, smsContent: String, delay: Long) {
@@ -31,4 +63,5 @@ object TaskManagerApi {
 
         Provider.TaskSchandler.addTask(task)
     }
+
 }

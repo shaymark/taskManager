@@ -2,10 +2,12 @@ package com.markoapps.taskmanager.di
 
 import android.annotation.SuppressLint
 import android.content.Context
+import com.google.gson.Gson
 import com.markoapps.taskmanager.actions.ActionFactory
 import com.markoapps.taskmanager.managers.CallManager
 import com.markoapps.taskmanager.managers.GeneralManager
 import com.markoapps.taskmanager.managers.SmsManager
+import com.markoapps.taskmanager.models.TasksDatabase
 import com.markoapps.taskmanager.tasks.TaskSchandler
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -32,6 +34,16 @@ object Provider {
 
     val TaskSchandler by lazy {
         TaskSchandler()
+    }
+
+    val gson by lazy {
+        Gson()
+    }
+
+    val executors = Executors.newSingleThreadExecutor()
+
+    val tasksDatabase: TasksDatabase by lazy {
+        TasksDatabase.getInstance(context)
     }
 
 }

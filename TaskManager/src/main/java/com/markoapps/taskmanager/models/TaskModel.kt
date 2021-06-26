@@ -1,27 +1,56 @@
 package models
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
+import com.markoapps.taskmanager.triggers.SmsFilter
 
+@Entity(tableName = "tasks")
 data class TaskModel (
+    @PrimaryKey @ColumnInfo(name = "id")
+    val id: String,
+    @ColumnInfo(name = "trigger")
     val trigger: TriggerModel,
-    val action: ActionModel)
+    @ColumnInfo(name = "condition")
+    val condition: Condition,
+    @ColumnInfo(name = "actionList")
+    val actionList: List<ActionModel>,
+    @ColumnInfo(name = "isActive")
+    val isActive: Boolean)
+
+sealed class ActionModel(
+    @SerializedName("type") val type: String) {
+    data class CallNumberActionModel(
+        @SerializedName("phoneNumber") val phoneNumber: String)
+        : ActionModel("CallNumberActionModel")
+    class CallStopActionModel()
+        : ActionModel("CallStopActionModel")
+    data class GeneralDelayActionModel(
+        @SerializedName("delay") val delay: Long)
+        : ActionModel("GeneralDelayActionModel")
+}
 
 
-data class ActionModel (
-    val type: ActionType,
-    val payload: Map<String, String>
+sealed class TriggerModel (
+    @SerializedName("type") val type: String) {
+    data class SMSTriggerType(
+        @SerializedName("smsFilter")val smsFilter: SmsFilter) :
+        TriggerModel("SMSTriggerType")
+}
+
+enum class NetworkStatus {
+    WIFI,
+    IDLE
+}
+
+enum class BatteryStatus {
+    LOW, MEDIUM, HIGH
+}
+
+
+data class Condition (
+    val networkStatus: NetworkStatus? = null,
+    val batteryStatus: BatteryStatus? = null
         )
 
-enum class ActionType {
-    call,
-    sendSms,
-    general
-}
-
-data class TriggerModel (
-    val type: TriggerType,
-    val payload: Map<String, String>)
-
-enum class TriggerType {
-    blueTooth,
-    call
-}

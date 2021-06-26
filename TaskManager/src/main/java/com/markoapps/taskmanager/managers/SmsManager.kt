@@ -32,27 +32,29 @@ public class SmsManager: Manager() {
 
 class SMSBroadcastReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent) {
-        val bundle = intent.extras
-        var msgs: Array<SmsMessage?>? = null
-        var str = "no message received"
-        if (bundle != null) {
-            val pdus = bundle["pdus"] as Array<Any>?
-            msgs = arrayOfNulls<SmsMessage>(pdus!!.size)
-            for (i in msgs.indices) {
-                msgs!![i] = SmsMessage.createFromPdu(pdus!![i] as ByteArray)
-                str += "SMS from Phone No: " + msgs[i]?.getOriginatingAddress()
-                str += """
+        Provider.executors.execute {
+            val bundle = intent.extras
+            var msgs: Array<SmsMessage?>? = null
+            var str = "no message received"
+            if (bundle != null) {
+                val pdus = bundle["pdus"] as Array<Any>?
+                msgs = arrayOfNulls<SmsMessage>(pdus!!.size)
+                for (i in msgs.indices) {
+                    msgs!![i] = SmsMessage.createFromPdu(pdus!![i] as ByteArray)
+                    str += "SMS from Phone No: " + msgs[i]?.getOriginatingAddress()
+                    str += """
                     
                     Message is: 
                     """.trimIndent()
-                str += msgs[i]?.getMessageBody().toString()
-                str += "\n"
-                val phoneNumber = msgs[i]?.getOriginatingAddress() ?: ""
-                val content = msgs[i]?.getMessageBody().toString()
-                Provider.smsManager.smsListener.setValue(SmsData(Date(), phoneNumber, content))
+                    str += msgs[i]?.getMessageBody().toString()
+                    str += "\n"
+                    val phoneNumber = msgs[i]?.getOriginatingAddress() ?: ""
+                    val content = msgs[i]?.getMessageBody().toString()
+                    Provider.smsManager.smsListener.setValue(SmsData(Date(), phoneNumber, content))
+                }
+                Log.v("Debug", str)
             }
-            Log.v("Debug", str)
-            Toast.makeText(context, str, Toast.LENGTH_SHORT).show()
         }
+
     }
 }
