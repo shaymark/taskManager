@@ -3,26 +3,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
+    app:startDestination="@id/TasksListFragment">
 
     <fragment
-        android:id="@+id/FirstFragment"
-        android:name="com.markoapps.tasks.FirstFragment"
-        android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
+        android:id="@+id/TasksListFragment"
+        android:name="com.markoapps.tasks.TasksListFragment"
+        android:label="@string/tasks_list_fragment_label"
+        tools:layout="@layout/fragment_tasks_list">
 
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+            android:id="@+id/action_TasksListFragment_to_TaskDetailsFragment"
+            app:destination="@id/TaskDetailsFragment" />
     </fragment>
     <fragment
-        android:id="@+id/SecondFragment"
-        android:name="com.markoapps.tasks.SecondFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
+        android:id="@+id/TaskDetailsFragment"
+        android:name="com.markoapps.tasks.TaskDetailsFragment"
+        android:label="@string/task_details_fragment_label"
+        tools:layout="@layout/fragment_task_details">
 
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_TaskDetailsFragment_to_TasksListFragment"
+            app:destination="@id/TasksListFragment" />
+        <argument
+            android:name="taskId"
+            app:argType="string" />
     </fragment>
 </navigation>

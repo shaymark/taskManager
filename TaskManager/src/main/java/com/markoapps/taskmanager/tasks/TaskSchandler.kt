@@ -7,9 +7,9 @@ import com.markoapps.taskmanager.actions.GeneralDelayAction
 import com.markoapps.taskmanager.di.Provider
 import com.markoapps.taskmanager.triggers.SmsTrigger
 import com.markoapps.taskmanager.triggers.Trigger
-import models.ActionModel
-import models.TaskModel
-import models.TriggerModel
+import com.markoapps.taskmanager.models.ActionModel
+import com.markoapps.taskmanager.models.TaskModel
+import com.markoapps.taskmanager.models.TriggerModel
 
 class TaskSchandler {
     val tasks: MutableMap<String, Task> = mutableMapOf()

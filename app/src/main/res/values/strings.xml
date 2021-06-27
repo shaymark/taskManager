@@ -2,8 +2,8 @@
     <string name="app_name">Tasks</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
+    <string name="tasks_list_fragment_label">Tasks list fragment</string>
+    <string name="task_details_fragment_label">Task details fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 

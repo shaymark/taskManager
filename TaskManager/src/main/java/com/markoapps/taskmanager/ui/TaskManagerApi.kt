@@ -13,7 +13,11 @@ import com.markoapps.taskmanager.tasks.Task
 import com.markoapps.taskmanager.triggers.SmsFilter
 import com.markoapps.taskmanager.triggers.SmsTrigger
 import com.markoapps.taskmanager.triggers.Trigger
-import models.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import com.markoapps.taskmanager.models.*
 
 object TaskManagerApi {
 
@@ -32,9 +36,23 @@ object TaskManagerApi {
         return Provider.tasksDatabase.tasksDao().getAllTask()
     }
 
+    fun getTaskListFlow(): Flow<List<TaskModel>> {
+        return Provider.tasksDatabase.tasksDao().getAllTaskFlow()
+    }
+
+    suspend fun getTaskDetails(taskId: String): TaskModel {
+        return Provider.tasksDatabase.tasksDao().getTaskById(taskId).first()
+    }
+
+    fun getTaskDetailsFlow(taskId: String): Flow<TaskModel> {
+        return Provider.tasksDatabase.tasksDao().getTaskByIdFlow(taskId).mapNotNull { it.first() }
+    }
+
     fun updateOrAddTask(task: TaskModel) {
-        Provider.tasksDatabase.tasksDao().addTask(task)
-        Provider.TaskSchandler.addTask(task)
+        Provider.executors.submit {
+            Provider.tasksDatabase.tasksDao().addTask(task)
+            Provider.TaskSchandler.addTask(task)
+        }
     }
 
     fun removeTask(task: TaskModel) {

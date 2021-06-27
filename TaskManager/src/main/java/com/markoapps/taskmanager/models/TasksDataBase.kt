@@ -6,14 +6,14 @@ import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.markoapps.taskmanager.di.Provider
 import com.markoapps.taskmanager.triggers.SmsFilter
-import models.*
+import com.markoapps.taskmanager.models.*
 import java.util.*
 import java.util.concurrent.Executors
 
 
 @Database(
     entities = [TaskModel::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -41,6 +41,7 @@ abstract class TasksDatabase : RoomDatabase() {
 
                 val task = TaskModel(
                     id = UUID.randomUUID().toString(),
+                    name = "open gate",
                     trigger = TriggerModel.SMSTriggerType(
                             smsFilter = SmsFilter(
                                 sender = "+972545352473",

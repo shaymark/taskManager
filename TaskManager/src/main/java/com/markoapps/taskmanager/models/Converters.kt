@@ -6,9 +6,9 @@ import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import com.markoapps.taskmanager.di.Provider
 import com.markoapps.taskmanager.triggers.SmsFilter
-import models.ActionModel
-import models.Condition
-import models.TriggerModel
+import com.markoapps.taskmanager.models.ActionModel
+import com.markoapps.taskmanager.models.Condition
+import com.markoapps.taskmanager.models.TriggerModel
 
 
 class Converters {

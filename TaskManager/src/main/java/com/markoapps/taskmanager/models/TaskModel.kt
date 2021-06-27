@@ -1,4 +1,4 @@
-package models
+package com.markoapps.taskmanager.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -10,6 +10,8 @@ import com.markoapps.taskmanager.triggers.SmsFilter
 data class TaskModel (
     @PrimaryKey @ColumnInfo(name = "id")
     val id: String,
+    @ColumnInfo(name = "name")
+    val name: String,
     @ColumnInfo(name = "trigger")
     val trigger: TriggerModel,
     @ColumnInfo(name = "condition")
