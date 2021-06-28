@@ -24,6 +24,9 @@ class TasksDetailsAdapter(val listener: TasksDetailsAdapterListener? = null) : a
 
     interface TasksDetailsAdapterListener {
         fun onAddActionClick()
+        fun onEditActionClick(actionPosition: Int)
+        fun onEditTriggerClick()
+        fun onDeleteActionClick(actionPosition: Int)
     }
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
@@ -38,8 +41,8 @@ class TasksDetailsAdapter(val listener: TasksDetailsAdapterListener? = null) : a
             }
 
             fun actionListToTaskDetailUiList(actions: List<ActionModel>): List<TaskDetailUi> {
-                return actions.map { actionModel ->
-                    actionToTaskDetailUi(actionModel)
+                return actions.mapIndexed { index, actionModel ->
+                    actionToTaskDetailUi(actionModel).copy(actionPosition = index)
                 }
             }
 
@@ -84,7 +87,7 @@ class TasksDetailsAdapter(val listener: TasksDetailsAdapterListener? = null) : a
         return when (viewType) {
             ITEM_VIEW_TYPE_GENERAL -> ViewHolderGeneral.from(parent)
             ITEM_VIEW_TYPE_TITLE -> ViewHolderTitle.from(parent, listener)
-            ITEM_VIEW_TYPE_ARGS -> ViewHolderArgs.from(parent)
+            ITEM_VIEW_TYPE_ARGS -> ViewHolderArgs.from(parent, listener)
             else -> throw ClassCastException("Unknown viewType $viewType")
         }
     }
@@ -152,11 +155,42 @@ class TasksDetailsAdapter(val listener: TasksDetailsAdapterListener? = null) : a
         }
     }
 
-    class ViewHolderArgs(val itemTaskTriggerBinding: ItemTaskDetailsArgsBinding): RecyclerView.ViewHolder(itemTaskTriggerBinding.root) {
+    class ViewHolderArgs(val itemTaskTriggerBinding: ItemTaskDetailsArgsBinding, val listener: TasksDetailsAdapterListener?): RecyclerView.ViewHolder(itemTaskTriggerBinding.root) {
 
         fun bind(argsData: TaskDetailUi.Args) {
             itemTaskTriggerBinding.apply {
                 title.text = argsData.title
+
+
+                edit.setOnClickListener {
+                    when(argsData.type) {
+                        TaskDetailUiArgsType.action -> {
+                            listener?.onEditActionClick(argsData.actionPosition)
+                        }
+                        TaskDetailUiArgsType.trigger -> {
+                            listener?.onEditTriggerClick()
+                        }
+                    }
+                }
+
+                when(argsData.type) {
+                    TaskDetailUiArgsType.action -> {
+                        edit.setOnClickListener {
+                            listener?.onEditActionClick(argsData.actionPosition)
+                        }
+                        delete.setOnClickListener {
+                            listener?.onDeleteActionClick(argsData.actionPosition)
+                        }
+                        delete.visibility = View.VISIBLE
+                    }
+                    TaskDetailUiArgsType.trigger -> {
+                        edit.setOnClickListener {
+                            listener?.onEditTriggerClick()
+                        }
+                        delete.visibility = View.GONE
+                    }
+                }
+
                 val keyValueList = listOf(
                         itemTaskTriggerBinding.keyValue0,
                         itemTaskTriggerBinding.keyValue1,
@@ -178,9 +212,9 @@ class TasksDetailsAdapter(val listener: TasksDetailsAdapterListener? = null) : a
         }
 
         companion object {
-            fun from(parent: ViewGroup): ViewHolderArgs {
+            fun from(parent: ViewGroup, listener: TasksDetailsAdapterListener?): ViewHolderArgs {
                 val inflater = LayoutInflater.from(parent.context)
-                return ViewHolderArgs(ItemTaskDetailsArgsBinding.inflate(inflater, parent, false))
+                return ViewHolderArgs(ItemTaskDetailsArgsBinding.inflate(inflater, parent, false), listener)
             }
         }
     }

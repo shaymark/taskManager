@@ -22,6 +22,8 @@ class TasksDetailsViewModel: ViewModel() {
         }
     }
 
+    var editedDialogPosition: Int? = null
+
     val taskLiveData: MutableLiveData<TaskModel> = MutableLiveData()
 
     val taskManagerApi = TaskManagerApi
@@ -29,6 +31,15 @@ class TasksDetailsViewModel: ViewModel() {
     fun saveTask() {
         taskLiveData?.value?.let {
             taskManagerApi.updateOrAddTask(it)
+        }
+    }
+
+    fun deleteAction(actionPostion: Int) {
+        val actionList = taskLiveData.value!!.actionList.toMutableList().apply {
+            removeAt(actionPostion)
+        }
+        taskLiveData?.value?.let {
+            taskLiveData.value = it.copy(actionList = actionList)
         }
     }
 
@@ -44,7 +55,26 @@ class TasksDetailsViewModel: ViewModel() {
         }
     }
 
-    fun addAction(actionModel: ActionModel) {
+    fun addOrUpdateAction(actionModel: ActionModel) {
+        if(editedDialogPosition == null) {
+            taskLiveData.value?.let {
+                taskLiveData.value = it.copy(actionList =
+                taskLiveData.value!!.actionList + actionModel
+                )
+            }
+        } else {
+            taskLiveData.value?.let {
+                val postion = editedDialogPosition!!
+                val actionList = taskLiveData.value!!.actionList.toMutableList().apply {
+                    set(postion, actionModel)
+                }
+                taskLiveData.value?.let {
+                    taskLiveData.value = it.copy(actionList = actionList)
+                }
+            }
+            editedDialogPosition = null
+        }
 
     }
+
 }

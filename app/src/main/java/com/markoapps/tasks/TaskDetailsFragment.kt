@@ -1,20 +1,14 @@
 package com.markoapps.tasks
 
-import android.R
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.*
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.afollestad.materialdialogs.MaterialDialog
 import com.markoapps.taskmanager.models.ActionModel
-import com.markoapps.taskmanager.models.TaskModel
-import com.markoapps.tasks.adapters.TasksAdapter
 import com.markoapps.tasks.adapters.TasksDetailsAdapter
 import com.markoapps.tasks.databinding.FragmentTaskDetailsBinding
 import com.markoapps.tasks.dialogs.AddActivityDialog
@@ -46,9 +40,10 @@ class TaskDetailsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         taskDetailAdapter = TasksDetailsAdapter(object: TasksDetailsAdapter.TasksDetailsAdapterListener {
-            override fun onAddActionClick() {
-                addAction()
-            }
+            override fun onAddActionClick() = addAction()
+            override fun onEditActionClick(actionPosition: Int) = editAction(actionPosition)
+            override fun onEditTriggerClick() = TODO("Not yet implemented")
+            override fun onDeleteActionClick(actionPosition: Int) = deleteAction(actionPosition)
         })
 
         viewBindings.apply {
@@ -65,19 +60,44 @@ class TaskDetailsFragment : Fragment() {
         viewModel.taskId = args.taskId
     }
 
-
     fun addAction(){
-        val dialog = AddActivityDialog()
-        dialog.show(parentFragmentManager, "addActivity")
-        setFragmentResultListener("dialogFragment") { requestKey, bundle ->
-            clearFragmentResultListener("dialogFragment")
-            val dialog = parentFragmentManager.findFragmentByTag("addAction") as? AddActivityDialog
-            dialog?.dismiss()
-            val result = bundle.getSerializable("action") as? ActionModel
-            if(result != null) {
-                viewModel.addAction(result)
+        openActionDialog(null)
+    }
+
+    fun editAction(actionPosition: Int) {
+        viewModel.editedDialogPosition = actionPosition ///??????????? need to find difrent solution
+        val actionModel = viewModel.taskLiveData.value!!.actionList.get(actionPosition)
+        openActionDialog(actionModel)
+    }
+
+    fun deleteAction(actionPosition: Int) {
+        MaterialDialog(requireContext()).show {
+            title(text = "are you sure you want to delete?")
+            positiveButton {
+                viewModel.deleteAction(actionPosition)
+                viewModel.saveTask()
             }
         }
+
+    }
+
+    fun openActionDialog(actionModel: ActionModel?){
+        val dialog = AddActivityDialog.getInstace(actionModel = actionModel)
+        dialog.show(parentFragmentManager, DIALOG_FRAGMENT_TAG)
+        setFragmentResultListener(AddActivityDialog.ACTION_RESULT_KEY) { requestKey, bundle ->
+            clearFragmentResultListener(AddActivityDialog.ACTION_RESULT_KEY)
+            val dialog = parentFragmentManager.findFragmentByTag(DIALOG_FRAGMENT_TAG) as? AddActivityDialog
+            dialog?.dismiss()
+            val result = bundle.getSerializable(AddActivityDialog.ACTION_BUNDLE_KEY) as? ActionModel
+            if(result != null) {
+                viewModel.addOrUpdateAction(result)
+                viewModel.saveTask()
+            }
+        }
+    }
+
+    companion object {
+        const val DIALOG_FRAGMENT_TAG =  "addActivity"
     }
 
 }

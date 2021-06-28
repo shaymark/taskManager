@@ -25,6 +25,8 @@ sealed class TaskDetailUi {
             override val id: String,
             val title: String,
             val list: List<KeyValuePair>,
+            val type: TaskDetailUiArgsType,
+            val actionPosition: Int = 0
     ) : TaskDetailUi()
 }
 
@@ -41,6 +43,12 @@ enum class TitleType {
     condition
 }
 
+enum class TaskDetailUiArgsType {
+    trigger,
+    action,
+    condition
+}
+
 fun triggerToTaskDetailUi(triggerModel: TriggerModel): TaskDetailUi.Args = when(triggerModel) {
     is TriggerModel.SMSTriggerType -> {
         TaskDetailUi.Args(
@@ -49,7 +57,8 @@ fun triggerToTaskDetailUi(triggerModel: TriggerModel): TaskDetailUi.Args = when(
             list = listOf(
                 KeyValuePair("sender", triggerModel.smsFilter.sender, null, true),
                 KeyValuePair("contains", triggerModel.smsFilter.content, null, true),
-            )
+            ),
+            type = TaskDetailUiArgsType.trigger
         )
     }
 }
@@ -61,14 +70,16 @@ fun actionToTaskDetailUi(actionModel: ActionModel) : TaskDetailUi.Args  = when(a
             title = "call number",
             list = listOf(
                 KeyValuePair("call to", actionModel.phoneNumber,null, true),
-            )
+            ),
+            type = TaskDetailUiArgsType.action
         )
     }
     is ActionModel.CallStopActionModel -> {
         TaskDetailUi.Args(
             id = UUID.randomUUID().toString(),
             title = "hang up call number",
-            list = listOf()
+            list = listOf(),
+            type = TaskDetailUiArgsType.action
         )
     }
     is ActionModel.GeneralDelayActionModel -> {
@@ -77,7 +88,8 @@ fun actionToTaskDetailUi(actionModel: ActionModel) : TaskDetailUi.Args  = when(a
             title = "delay",
             list = listOf(
                 KeyValuePair("delay[seconds]", (actionModel.delay / 1000).toString(), null, true),
-            )
+            ),
+            type = TaskDetailUiArgsType.action
         )
     }
 }
