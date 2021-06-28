@@ -1,6 +1,7 @@
 package com.markoapps.tasks.viewmodels
 
 import androidx.lifecycle.*
+import com.markoapps.taskmanager.models.ActionModel
 import com.markoapps.taskmanager.ui.TaskManagerApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,5 +42,9 @@ class TasksDetailsViewModel: ViewModel() {
         taskLiveData.value?.let {
             taskLiveData.value = it.copy(isActive = isActive)
         }
+    }
+
+    fun addAction(actionModel: ActionModel) {
+
     }
 }

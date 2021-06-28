@@ -11,9 +11,7 @@ import com.markoapps.taskmanager.models.TriggerModel
 import com.markoapps.tasks.databinding.ItemTaskDetailsArgsBinding
 import com.markoapps.tasks.databinding.ItemTaskDetailsGeneralBinding
 import com.markoapps.tasks.databinding.ItemTaskDetailsTitleBinding
-import com.markoapps.tasks.uimodels.KeyValuePair
-import com.markoapps.tasks.uimodels.TaskDetailUi
-import com.markoapps.tasks.uimodels.TitleType
+import com.markoapps.tasks.uimodels.*
 import kotlinx.coroutines.*
 import java.lang.ClassCastException
 import java.util.*
@@ -22,7 +20,11 @@ private val ITEM_VIEW_TYPE_GENERAL =    0
 private val ITEM_VIEW_TYPE_TITLE =      1
 private val ITEM_VIEW_TYPE_ARGS =     2
 
-class TasksDetailsAdapter() : androidx.recyclerview.widget.ListAdapter<TaskDetailUi, RecyclerView.ViewHolder>(DiffTaskUtil()) {
+class TasksDetailsAdapter(val listener: TasksDetailsAdapterListener? = null) : androidx.recyclerview.widget.ListAdapter<TaskDetailUi, RecyclerView.ViewHolder>(DiffTaskUtil()) {
+
+    interface TasksDetailsAdapterListener {
+        fun onAddActionClick()
+    }
 
     private val adapterScope = CoroutineScope(Dispatchers.Default)
 
@@ -31,51 +33,13 @@ class TasksDetailsAdapter() : androidx.recyclerview.widget.ListAdapter<TaskDetai
 
             fun triggerToTaskDetailUiList(triggerModel: TriggerModel): List<TaskDetailUi> {
                 return listOf(triggerModel).map {
-                    when(triggerModel) {
-                        is TriggerModel.SMSTriggerType -> {
-                            TaskDetailUi.Args(
-                                    id = UUID.randomUUID().toString(),
-                                    title = "sms trigger",
-                                    list = listOf(
-                                            KeyValuePair("sender", triggerModel.smsFilter.sender),
-                                            KeyValuePair("contains", triggerModel.smsFilter.content),
-                                    )
-                            )
-                        }
-                    }
-
+                    triggerToTaskDetailUi(triggerModel)
                 }
             }
 
             fun actionListToTaskDetailUiList(actions: List<ActionModel>): List<TaskDetailUi> {
                 return actions.map { actionModel ->
-                    when(actionModel) {
-                        is ActionModel.CallNumberActionModel -> {
-                            TaskDetailUi.Args(
-                                    id = UUID.randomUUID().toString(),
-                                    title = "call number",
-                                    list = listOf(
-                                            KeyValuePair("call to", actionModel.phoneNumber),
-                                    )
-                            )
-                        }
-                        is ActionModel.CallStopActionModel -> {
-                            TaskDetailUi.Args(
-                                    id = UUID.randomUUID().toString(),
-                                    title = "hang up call number",
-                                    list = listOf()
-                            )
-                        }
-                        is ActionModel.GeneralDelayActionModel -> {
-                            TaskDetailUi.Args(
-                                    id = UUID.randomUUID().toString(),
-                                    title = "delay",
-                                    list = listOf(
-                                            KeyValuePair("delay[seconds]", (actionModel.delay / 1000).toString()),
-                                    )
-                            )
-                        }
-                    }
+                    actionToTaskDetailUi(actionModel)
                 }
             }
 
@@ -119,7 +83,7 @@ class TasksDetailsAdapter() : androidx.recyclerview.widget.ListAdapter<TaskDetai
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             ITEM_VIEW_TYPE_GENERAL -> ViewHolderGeneral.from(parent)
-            ITEM_VIEW_TYPE_TITLE -> ViewHolderTitle.from(parent)
+            ITEM_VIEW_TYPE_TITLE -> ViewHolderTitle.from(parent, listener)
             ITEM_VIEW_TYPE_ARGS -> ViewHolderArgs.from(parent)
             else -> throw ClassCastException("Unknown viewType $viewType")
         }
@@ -169,18 +133,21 @@ class TasksDetailsAdapter() : androidx.recyclerview.widget.ListAdapter<TaskDetai
         }
     }
 
-    class ViewHolderTitle(val itemTaskBinding: ItemTaskDetailsTitleBinding): RecyclerView.ViewHolder(itemTaskBinding.root) {
+    class ViewHolderTitle(val itemTaskBinding: ItemTaskDetailsTitleBinding, val listener: TasksDetailsAdapterListener?): RecyclerView.ViewHolder(itemTaskBinding.root) {
 
         fun bind(titleData: TaskDetailUi.Title) {
             itemTaskBinding.apply {
                 title.text = titleData.title
+                add.setOnClickListener{
+                    listener?.onAddActionClick()
+                }
             }
         }
 
         companion object {
-            fun from(parent: ViewGroup): ViewHolderTitle {
+            fun from(parent: ViewGroup, listener: TasksDetailsAdapterListener?): ViewHolderTitle {
                 val inflater = LayoutInflater.from(parent.context)
-                return ViewHolderTitle(ItemTaskDetailsTitleBinding.inflate(inflater, parent, false))
+                return ViewHolderTitle(ItemTaskDetailsTitleBinding.inflate(inflater, parent, false), listener)
             }
         }
     }
@@ -200,6 +167,7 @@ class TasksDetailsAdapter() : androidx.recyclerview.widget.ListAdapter<TaskDetai
 
                 keyValueList.forEachIndexed { index, item ->
                     if(index < argsData.list.size ) {
+                        item.root.visibility = View.VISIBLE
                         item.key.text = argsData.list[index].key
                         item.value.text = argsData.list[index].value
                     } else {

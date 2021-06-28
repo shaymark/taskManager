@@ -8,14 +8,16 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.core.widget.doAfterTextChanged
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.*
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.markoapps.taskmanager.models.ActionModel
+import com.markoapps.taskmanager.models.TaskModel
 import com.markoapps.tasks.adapters.TasksAdapter
 import com.markoapps.tasks.adapters.TasksDetailsAdapter
 import com.markoapps.tasks.databinding.FragmentTaskDetailsBinding
+import com.markoapps.tasks.dialogs.AddActivityDialog
 
 import com.markoapps.tasks.viewmodels.TasksDetailsViewModel
 
@@ -43,7 +45,11 @@ class TaskDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        taskDetailAdapter = TasksDetailsAdapter()
+        taskDetailAdapter = TasksDetailsAdapter(object: TasksDetailsAdapter.TasksDetailsAdapterListener {
+            override fun onAddActionClick() {
+                addAction()
+            }
+        })
 
         viewBindings.apply {
             list.apply {
@@ -58,6 +64,22 @@ class TaskDetailsFragment : Fragment() {
 
         viewModel.taskId = args.taskId
     }
+
+
+    fun addAction(){
+        val dialog = AddActivityDialog()
+        dialog.show(parentFragmentManager, "addActivity")
+        setFragmentResultListener("dialogFragment") { requestKey, bundle ->
+            clearFragmentResultListener("dialogFragment")
+            val dialog = parentFragmentManager.findFragmentByTag("addAction") as? AddActivityDialog
+            dialog?.dismiss()
+            val result = bundle.getSerializable("action") as? ActionModel
+            if(result != null) {
+                viewModel.addAction(result)
+            }
+        }
+    }
+
 }
 
 

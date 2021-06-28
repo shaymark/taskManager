@@ -21,8 +21,8 @@ data class TaskModel (
     @ColumnInfo(name = "isActive")
     val isActive: Boolean)
 
-sealed class ActionModel(
-    @SerializedName("type") val type: String) {
+
+sealed class ActionModel(@SerializedName("type") val type: String) : java.io.Serializable{
     data class CallNumberActionModel(
         @SerializedName("phoneNumber") val phoneNumber: String)
         : ActionModel("CallNumberActionModel")
