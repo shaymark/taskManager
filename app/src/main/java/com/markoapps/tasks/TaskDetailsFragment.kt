@@ -10,7 +10,11 @@ import android.widget.ArrayAdapter
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.markoapps.tasks.adapters.TasksAdapter
+import com.markoapps.tasks.adapters.TasksDetailsAdapter
 import com.markoapps.tasks.databinding.FragmentTaskDetailsBinding
 
 import com.markoapps.tasks.viewmodels.TasksDetailsViewModel
@@ -23,6 +27,8 @@ class TaskDetailsFragment : Fragment() {
     lateinit var viewBindings : FragmentTaskDetailsBinding
     val viewModel: TasksDetailsViewModel by viewModels()
     val args: TaskDetailsFragmentArgs by navArgs()
+
+    lateinit var taskDetailAdapter: TasksDetailsAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,11 +43,28 @@ class TaskDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        taskDetailAdapter = TasksDetailsAdapter()
 
+        viewBindings.apply {
+            list.apply {
+                list.adapter = taskDetailAdapter
+                layoutManager = LinearLayoutManager(context)
+            }
+        }
 
         viewModel.taskLiveData.observe(viewLifecycleOwner) {
-            viewBindings.apply {
-                id.text = it.id
+            taskDetailAdapter.updateTaskModel(it)
+        }
+
+        viewModel.taskId = args.taskId
+    }
+}
+
+
+
+/*
+
+                        id.text = it.id
                 if(!it.name.equals(name.text.toString())) {
                     name.setText(it.name)
                 }
@@ -94,7 +117,4 @@ class TaskDetailsFragment : Fragment() {
             }
         }
 
-        viewModel.taskId = args.taskId
-
-    }
-}
+        */
