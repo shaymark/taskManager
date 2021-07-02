@@ -55,8 +55,11 @@ object TaskManagerApi {
         }
     }
 
-    fun removeTask(task: TaskModel) {
-        Provider.tasksDatabase.tasksDao().deleteTask(task)
+    fun deleteTask(task: TaskModel) {
+        Provider.executors.submit {
+            Provider.tasksDatabase.tasksDao().deleteTask(task)
+            Provider.TaskSchandler.removeTask(task)
+        }
     }
 
     private fun initTaskFromDb(tasksDatabase: TasksDatabase) {

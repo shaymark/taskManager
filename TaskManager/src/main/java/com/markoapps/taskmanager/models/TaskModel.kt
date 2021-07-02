@@ -34,8 +34,8 @@ sealed class ActionModel(@SerializedName("type") val type: String) : java.io.Ser
 }
 
 
-sealed class TriggerModel (
-    @SerializedName("type") val type: String) {
+sealed class TriggerModel  (
+    @SerializedName("type") val type: String)  : java.io.Serializable{
     data class SMSTriggerType(
         @SerializedName("smsFilter")val smsFilter: SmsFilter) :
         TriggerModel("SMSTriggerType")

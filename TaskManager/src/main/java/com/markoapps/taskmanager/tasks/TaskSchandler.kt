@@ -18,6 +18,13 @@ class TaskSchandler {
         addTask(taskFromTaskModel(taskModel))
     }
 
+    fun removeTask(taskModel: TaskModel) {
+        val taskId = taskModel.id
+       val task = tasks[taskId]
+       task?.deactivateTask()
+       tasks.remove(taskId)
+    }
+
     fun addTask(task: Task) {
         tasks[task.taskId] = task
         task.taskSchandler = this

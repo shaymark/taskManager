@@ -39,29 +39,7 @@ abstract class TasksDatabase : RoomDatabase() {
                 super.onCreate(db)
                 // do something after database has been created
 
-                val task = TaskModel(
-                    id = UUID.randomUUID().toString(),
-                    name = "open gate",
-                    trigger = TriggerModel.SMSTriggerType(
-                            smsFilter = SmsFilter(
-                                sender = "+972545352473",
-                                content = "call home gate"
-                            )
-                        )
-                    ,
-                    condition = Condition(),
-                    actionList = listOf(
-                        ActionModel.CallNumberActionModel(
-                            phoneNumber = "+972542544581"
-                        ),
-                        ActionModel.GeneralDelayActionModel(
-                            delay = 20000
-                        )
-                        ,
-                        ActionModel.CallStopActionModel()
-                    ),
-                    isActive = true
-                )
+                val task = DefaultTaskModel
 
                 Provider.executors.execute {
                     instance?.tasksDao()?.apply {
@@ -80,5 +58,30 @@ abstract class TasksDatabase : RoomDatabase() {
 
     abstract fun tasksDao(): TasksDao
 
+
 }
+
+val DefaultTaskModel =  TaskModel(
+        id = UUID.randomUUID().toString(),
+        name = "open gate",
+        trigger = TriggerModel.SMSTriggerType(
+                smsFilter = SmsFilter(
+                        sender = "+972545352473",
+                        content = "call home gate"
+                )
+        )
+        ,
+        condition = Condition(),
+        actionList = listOf(
+                ActionModel.CallNumberActionModel(
+                        phoneNumber = "+972542544581"
+                ),
+                ActionModel.GeneralDelayActionModel(
+                        delay = 20000
+                )
+                ,
+                ActionModel.CallStopActionModel()
+        ),
+        isActive = true
+)
 
