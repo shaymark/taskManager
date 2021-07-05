@@ -23,7 +23,9 @@ private val ITEM_VIEW_TYPE_ARGS =     2
 class TasksDetailsAdapter(val listener: TasksDetailsAdapterListener? = null) : androidx.recyclerview.widget.ListAdapter<TaskDetailUi, RecyclerView.ViewHolder>(DiffTaskUtil()) {
 
     interface TasksDetailsAdapterListener {
+        fun onEditGeneralClick()
         fun onAddActionClick()
+        fun onAddTriggerClick()
         fun onEditActionClick(actionPosition: Int)
         fun onEditTriggerClick()
         fun onDeleteActionClick(actionPosition: Int)
@@ -85,7 +87,7 @@ class TasksDetailsAdapter(val listener: TasksDetailsAdapterListener? = null) : a
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
-            ITEM_VIEW_TYPE_GENERAL -> ViewHolderGeneral.from(parent)
+            ITEM_VIEW_TYPE_GENERAL -> ViewHolderGeneral.from(parent, listener)
             ITEM_VIEW_TYPE_TITLE -> ViewHolderTitle.from(parent, listener)
             ITEM_VIEW_TYPE_ARGS -> ViewHolderArgs.from(parent, listener)
             else -> throw ClassCastException("Unknown viewType $viewType")
@@ -118,20 +120,22 @@ class TasksDetailsAdapter(val listener: TasksDetailsAdapterListener? = null) : a
 
     }
 
-    class ViewHolderGeneral(val itemTaskBinding: ItemTaskDetailsGeneralBinding): RecyclerView.ViewHolder(itemTaskBinding.root) {
+    class ViewHolderGeneral(val itemTaskBinding: ItemTaskDetailsGeneralBinding, val listener: TasksDetailsAdapterListener?): RecyclerView.ViewHolder(itemTaskBinding.root) {
 
         fun bind(generalData: TaskDetailUi.General) {
             itemTaskBinding.apply {
-                id.text = generalData.id
                 name.text = generalData.name
                 isActive.text = generalData.isActive.toString()
+                edit.setOnClickListener{
+                    listener?.onEditGeneralClick()
+                }
             }
         }
 
         companion object {
-            fun from(parent: ViewGroup): ViewHolderGeneral {
+            fun from(parent: ViewGroup, listener: TasksDetailsAdapterListener?): ViewHolderGeneral {
                 val inflater = LayoutInflater.from(parent.context)
-                return ViewHolderGeneral(ItemTaskDetailsGeneralBinding.inflate(inflater, parent, false))
+                return ViewHolderGeneral(ItemTaskDetailsGeneralBinding.inflate(inflater, parent, false), listener)
             }
         }
     }
@@ -142,7 +146,10 @@ class TasksDetailsAdapter(val listener: TasksDetailsAdapterListener? = null) : a
             itemTaskBinding.apply {
                 title.text = titleData.title
                 add.setOnClickListener{
-                    listener?.onAddActionClick()
+                    when(titleData.type) {
+                        TitleType.trigger -> listener?.onAddTriggerClick()
+                        TitleType.action -> listener?.onAddActionClick()
+                    }
                 }
             }
         }
@@ -155,10 +162,10 @@ class TasksDetailsAdapter(val listener: TasksDetailsAdapterListener? = null) : a
         }
     }
 
-    class ViewHolderArgs(val itemTaskTriggerBinding: ItemTaskDetailsArgsBinding, val listener: TasksDetailsAdapterListener?): RecyclerView.ViewHolder(itemTaskTriggerBinding.root) {
+    class ViewHolderArgs(val itemTaskDetailsArgsBinding: ItemTaskDetailsArgsBinding, val listener: TasksDetailsAdapterListener?): RecyclerView.ViewHolder(itemTaskDetailsArgsBinding.root) {
 
         fun bind(argsData: TaskDetailUi.Args) {
-            itemTaskTriggerBinding.apply {
+            itemTaskDetailsArgsBinding.apply {
                 title.text = argsData.title
 
 
@@ -192,11 +199,11 @@ class TasksDetailsAdapter(val listener: TasksDetailsAdapterListener? = null) : a
                 }
 
                 val keyValueList = listOf(
-                        itemTaskTriggerBinding.keyValue0,
-                        itemTaskTriggerBinding.keyValue1,
-                        itemTaskTriggerBinding.keyValue2,
-                        itemTaskTriggerBinding.keyValue3,
-                        itemTaskTriggerBinding.keyValue4,
+                        itemTaskDetailsArgsBinding.keyValue0,
+                        itemTaskDetailsArgsBinding.keyValue1,
+                        itemTaskDetailsArgsBinding.keyValue2,
+                        itemTaskDetailsArgsBinding.keyValue3,
+                        itemTaskDetailsArgsBinding.keyValue4,
                 )
 
                 keyValueList.forEachIndexed { index, item ->

@@ -6,6 +6,11 @@ import com.markoapps.taskmanager.models.TaskModel
 
 class TasksViewModel: ViewModel() {
 
-    val taskLiveData: LiveData<List<TaskModel>> = TaskManagerApi.getTaskListFlow().asLiveData()
+    val taskManagerApi = TaskManagerApi
 
+    val taskLiveData: LiveData<List<TaskModel>> = taskManagerApi.getTaskListFlow().asLiveData()
+
+    fun deleteTask(taskModel: TaskModel) {
+        taskManagerApi.deleteTask(taskModel)
+    }
 }

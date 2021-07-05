@@ -7,25 +7,33 @@ import androidx.recyclerview.widget.RecyclerView
 import com.markoapps.tasks.databinding.ItemTaskBinding
 import com.markoapps.taskmanager.models.TaskModel
 
-class TasksAdapter(val onClick: (task: TaskModel) -> Unit) : androidx.recyclerview.widget.ListAdapter<TaskModel, TasksAdapter.ViewHolder>(DiffTaskUtil()) {
+class TasksAdapter(val listener: ClickListener) : androidx.recyclerview.widget.ListAdapter<TaskModel, TasksAdapter.ViewHolder>(DiffTaskUtil()) {
+
+    interface ClickListener {
+        fun onClickCell(task: TaskModel)
+        fun onClickDelete(task: TaskModel)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return ViewHolder(ItemTaskBinding.inflate(inflater, parent, false))
+        return ViewHolder(ItemTaskBinding.inflate(inflater, parent, false), listener)
     }
 
      override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    inner class ViewHolder(val itemTaskBinding: ItemTaskBinding): RecyclerView.ViewHolder(itemTaskBinding.root) {
+    class ViewHolder(val itemTaskBinding: ItemTaskBinding, val listener: ClickListener): RecyclerView.ViewHolder(itemTaskBinding.root) {
 
         fun bind(taskModel: TaskModel) {
             itemTaskBinding.apply {
                 taskId.text = taskModel.id
                 taskName.text = taskModel.name
                 root.setOnClickListener {
-                    onClick(taskModel)
+                    listener.onClickCell(taskModel)
+                }
+                delete.setOnClickListener{
+                    listener.onClickDelete(taskModel)
                 }
             }
         }

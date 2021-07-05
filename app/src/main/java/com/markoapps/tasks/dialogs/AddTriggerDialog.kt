@@ -9,20 +9,15 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import com.markoapps.taskmanager.models.ActionModel
 import com.markoapps.taskmanager.models.TriggerModel
+import com.markoapps.taskmanager.triggers.SmsFilter
 import com.markoapps.tasks.databinding.ItemTaskDetailsEditBinding
 import com.markoapps.tasks.uimodels.TaskDetailUi
 import com.markoapps.tasks.uimodels.actionToTaskDetailUi
+import com.markoapps.tasks.uimodels.triggerToTaskDetailUi
 
-class AddActivityDialog: DialogFragment() {
+class AddTriggerDialog: DialogFragment() {
 
     lateinit var itemTaskDetailsEditBinding : ItemTaskDetailsEditBinding
-
-    var actionType: ActionType? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        actionType = savedInstanceState?.getSerializable("action_type") as? ActionType
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,46 +31,38 @@ class AddActivityDialog: DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+
+        val triggerModel: TriggerModel? = requireArguments()[ARG_ACTION_KEY] as? TriggerModel
+        val triggerType: TriggerType = triggerModel?.toTriggerType() ?:  requireArguments()[ARG_ACTION_TYPE_KEY] as TriggerType
+
+        setAction(triggerType, triggerModel)
+
         itemTaskDetailsEditBinding.save.setOnClickListener {
-            setFragmentResult(ACTION_RESULT_KEY, bundleOf(ACTION_BUNDLE_KEY to uiToActionType()))
+            setFragmentResult(ACTION_RESULT_KEY, bundleOf(ACTION_BUNDLE_KEY to uiToTriggerModel(triggerType)))
         }
 
-        val actionModel: ActionModel? = requireArguments()[ARG_ACTION_KEY] as? ActionModel
-        val actionType: ActionType = actionModel?.toActionType() ?:  requireArguments()[ARG_ACTION_TYPE_KEY] as ActionType
-
-        setAction(actionType, actionModel)
-
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putSerializable("action_type", actionType)
-    }
-
-    fun uiToActionType(): ActionModel{
+    fun uiToTriggerModel(triggerType: TriggerType): TriggerModel{
         itemTaskDetailsEditBinding.apply {
 
             val newValues = actionContainer.getArgs()!!
 
-            return when(actionType) {
-                ActionType.CALL -> ActionModel.CallNumberActionModel(newValues[0].value!!)
-                ActionType.STOP -> ActionModel.CallStopActionModel()
-                ActionType.DELAY -> ActionModel.GeneralDelayActionModel(newValues[0].value!!.toLong() * 1000)
-                else -> ActionModel.GeneralDelayActionModel(0)
+            return when(triggerType) {
+                TriggerType.SMS -> TriggerModel.SMSTriggerType(SmsFilter(newValues[0].value, newValues[1].value))
+                else -> TriggerModel.SMSTriggerType(SmsFilter(newValues[0].value, newValues[1].value))
             }
         }
     }
 
-    fun setAction(actionType: ActionType, actionModel: ActionModel? = null) {
-        this.actionType = actionType
+    fun setAction(triggerType: TriggerType, triggerModel: TriggerModel? = null) {
         itemTaskDetailsEditBinding.apply {
-            val argsData: TaskDetailUi.Args = actionToTaskDetailUi(
-                actionModel ?:
+            val argsData: TaskDetailUi.Args = triggerToTaskDetailUi(
+            triggerModel ?:
                 // for new action
-                when (actionType) {
-                    ActionType.CALL -> ActionModel.CallNumberActionModel("")
-                    ActionType.STOP -> ActionModel.CallStopActionModel()
-                    ActionType.DELAY -> ActionModel.GeneralDelayActionModel(0)
+                when (triggerType) {
+                    TriggerType.SMS -> TriggerModel.SMSTriggerType(SmsFilter("xxxxxx", "yyyyyyy"))
                 }
             )
 
@@ -85,11 +72,11 @@ class AddActivityDialog: DialogFragment() {
     }
 
     companion object {
-        fun getInstace(actionModel: ActionModel?, actionType: ActionType?) : AddActivityDialog =
-            AddActivityDialog().apply {
+        fun getInstace(triggerModel: TriggerModel?, triggerType: TriggerType?) : AddTriggerDialog =
+            AddTriggerDialog().apply {
                 arguments = bundleOf(
-                    ARG_ACTION_KEY to actionModel,
-                    ARG_ACTION_TYPE_KEY to actionType
+                    ARG_ACTION_KEY to triggerModel,
+                    ARG_ACTION_TYPE_KEY to triggerType
                 )
             }
 
@@ -102,9 +89,6 @@ class AddActivityDialog: DialogFragment() {
     }
 }
 
-enum class ActionType {
-    CALL, STOP, DELAY
-}
 
 enum class TriggerType {
     SMS
@@ -112,13 +96,4 @@ enum class TriggerType {
 
 fun TriggerModel.toTriggerType() = when(this) {
     is TriggerModel.SMSTriggerType -> TriggerType.SMS
-}
-
-
-
-fun ActionModel.toActionType() = when(this) {
-    is ActionModel.CallNumberActionModel -> ActionType.CALL
-    is ActionModel.CallStopActionModel -> ActionType.STOP
-    is ActionModel.GeneralDelayActionModel -> ActionType.DELAY
-    else -> ActionType.CALL
 }

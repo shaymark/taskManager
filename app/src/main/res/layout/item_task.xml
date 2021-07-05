@@ -6,16 +6,20 @@
     android:layout_height="wrap_content"
     tools:context=".TasksListFragment">
 
+
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/title_container"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/delete">
 
         <TextView
             android:id="@+id/task_id"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="hello 1"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -36,6 +40,18 @@
             tools:text="ds fdsa fdas fsad fs" />
 
     </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/delete"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/ic_delete"
+        >
+
+    </ImageButton>
 
 
 

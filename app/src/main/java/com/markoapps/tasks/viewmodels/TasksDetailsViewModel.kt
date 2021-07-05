@@ -6,6 +6,7 @@ import com.markoapps.taskmanager.ui.TaskManagerApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import com.markoapps.taskmanager.models.TaskModel
+import com.markoapps.taskmanager.models.TriggerModel
 
 class TasksDetailsViewModel: ViewModel() {
 
@@ -52,6 +53,12 @@ class TasksDetailsViewModel: ViewModel() {
     fun setActive(isActive: Boolean) {
         taskLiveData.value?.let {
             taskLiveData.value = it.copy(isActive = isActive)
+        }
+    }
+
+    fun updateTrigger(triggerModel: TriggerModel) {
+        taskLiveData.value?.let {
+            taskLiveData.value = it.copy(trigger = triggerModel)
         }
     }
 

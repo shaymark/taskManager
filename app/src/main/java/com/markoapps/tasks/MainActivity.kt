@@ -15,9 +15,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import com.markoapps.taskmanager.models.DefaultTaskModel
+import com.markoapps.taskmanager.models.TaskModel
+import com.markoapps.taskmanager.ui.TaskManagerApi
+import java.util.*
 
 
 class MainActivity : AppCompatActivity() {
+
+    val taskManagerApi = TaskManagerApi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,8 +31,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
 
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+            taskManagerApi.updateOrAddTask(DefaultTaskModel.copy(id = UUID.randomUUID().toString(), isActive = false))
         }
 
         requestMultiplePermissionLauncher.launch(

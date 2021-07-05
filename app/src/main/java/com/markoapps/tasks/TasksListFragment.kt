@@ -8,6 +8,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.afollestad.materialdialogs.MaterialDialog
+import com.markoapps.taskmanager.models.TaskModel
+import com.markoapps.taskmanager.ui.TaskManagerApi
 import com.markoapps.tasks.adapters.TasksAdapter
 import com.markoapps.tasks.databinding.FragmentTasksListBinding
 import com.markoapps.tasks.viewmodels.TasksViewModel
@@ -26,7 +29,6 @@ class TasksListFragment : Fragment() {
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-//         Inflate the layout for this fragment
         viewBinding = FragmentTasksListBinding.inflate(inflater, container, false)
         return viewBinding.root
 
@@ -36,10 +38,23 @@ class TasksListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
-        taskAdapter = TasksAdapter {
-            val action = TasksListFragmentDirections.actionTasksListFragmentToTaskDetailsFragment(it.id)
-            findNavController().navigate(action)
-        }
+        taskAdapter = TasksAdapter(listener = object : TasksAdapter.ClickListener{
+            override fun onClickCell(task: TaskModel) {
+                val action = TasksListFragmentDirections.actionTasksListFragmentToTaskDetailsFragment(task.id)
+                findNavController().navigate(action)
+            }
+
+            override fun onClickDelete(task: TaskModel) {
+                MaterialDialog(requireContext()).show {
+                    title(text = "are you sure you want to delete?")
+                    positiveButton {
+                        viewModel.deleteTask(task)
+                    }
+                }
+            }
+
+
+        })
 
         viewBinding.apply {
             taskList.apply {
@@ -51,5 +66,7 @@ class TasksListFragment : Fragment() {
         viewModel.taskLiveData.observe(viewLifecycleOwner) {
             taskAdapter.submitList(it)
         }
+
+
     }
 }
