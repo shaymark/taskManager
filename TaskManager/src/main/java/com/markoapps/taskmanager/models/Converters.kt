@@ -51,6 +51,7 @@ class Converters {
                 "CallNumberActionModel" ->  Provider.gson.fromJson(it, ActionModel.CallNumberActionModel::class.java)
                 "CallStopActionModel" ->  Provider.gson.fromJson(it, ActionModel.CallStopActionModel::class.java)
                 "GeneralDelayActionModel" ->  Provider.gson.fromJson(it, ActionModel.GeneralDelayActionModel::class.java)
+                "OpenAppActionModel" -> Provider.gson.fromJson(it, ActionModel.OpenAppActionModel::class.java)
                 else -> null
             }
           }

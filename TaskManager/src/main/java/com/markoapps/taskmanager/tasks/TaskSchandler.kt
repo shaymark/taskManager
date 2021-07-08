@@ -1,9 +1,6 @@
 package com.markoapps.taskmanager.tasks
 
-import com.markoapps.taskmanager.actions.Action
-import com.markoapps.taskmanager.actions.CallNumberAction
-import com.markoapps.taskmanager.actions.CallStopAction
-import com.markoapps.taskmanager.actions.GeneralDelayAction
+import com.markoapps.taskmanager.actions.*
 import com.markoapps.taskmanager.di.Provider
 import com.markoapps.taskmanager.triggers.SmsTrigger
 import com.markoapps.taskmanager.triggers.Trigger
@@ -57,6 +54,10 @@ private fun actionModelToAction(actionModel: ActionModel): Action {
             actionModel.delay,
             Provider.generalManager
         )
+        is ActionModel.OpenAppActionModel -> OpenAppAction(
+            actionModel.packageName,
+            Provider.appManager,
+        )
     }
 }
 
@@ -66,7 +67,6 @@ private fun triggerModelToTrigger(triggerModel: TriggerModel, task: Task) : Trig
             smsManager = Provider.smsManager,
             task = task,
             filter = triggerModel.smsFilter
-
         )
     }
 }

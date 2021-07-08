@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Tasks</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="tasks_list_fragment_label">Tasks list fragment</string>
+    <string name="task_details_fragment_label">Task details fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+</resources>

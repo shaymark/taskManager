@@ -31,6 +31,10 @@ sealed class ActionModel(@SerializedName("type") val type: String) : java.io.Ser
     data class GeneralDelayActionModel(
         @SerializedName("delay") val delay: Long)
         : ActionModel("GeneralDelayActionModel")
+    data class OpenAppActionModel(
+        @SerializedName("packageName") val packageName: String,
+        @SerializedName("appName") val appName: String,
+    ): ActionModel("OpenAppModel")
 }
 
 

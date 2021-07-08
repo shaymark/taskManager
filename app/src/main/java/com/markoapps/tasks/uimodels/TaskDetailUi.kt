@@ -99,4 +99,15 @@ fun actionToTaskDetailUi(actionModel: ActionModel) : TaskDetailUi.Args  = when(a
             type = TaskDetailUiArgsType.action
         )
     }
+    is ActionModel.OpenAppActionModel -> {
+        TaskDetailUi.Args(
+            id = UUID.randomUUID().toString(),
+            title = "open app",
+            list = listOf(
+                KeyValuePair(ChooseType.string,"app package", actionModel.packageName, null, true),
+                KeyValuePair(ChooseType.string,"app name", actionModel.appName, null, true),
+            ),
+            type = TaskDetailUiArgsType.action
+        )
+    }
 }

@@ -1,5 +1,7 @@
 package com.markoapps.tasks.dialogs
 
+import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
@@ -10,6 +12,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
@@ -17,48 +20,49 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.markoapps.tasks.adapters.ApplicationsAdapter
 import com.markoapps.tasks.databinding.ChooseApplicationDialogBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.markoapps.tasks.databinding.ChoosePhoneDialogBinding
+import kotlinx.coroutines.*
 import java.io.Serializable
 
-class ApplicationDialog: DialogFragment() {
+class ChooseApplicationDialog(context: Context, val appInfoCallback: (AppInfo) -> Unit): Dialog(context) {
+
+    private val scope = CoroutineScope(Dispatchers.Default)
 
     private var _binding: ChooseApplicationDialogBinding? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     private var listAdapter: ApplicationsAdapter? = null
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        setFullScreen()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        _binding = ChooseApplicationDialogBinding.inflate(layoutInflater, null, false)
+        setContentView(binding.root)
+        val window = this.window
+        window?.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT)
+
+        initViews()
+
+        setOnDismissListener {
+            scope.cancel()
+            _binding = null
+        }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = ChooseApplicationDialogBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    fun initViews(){
 
         getApplicationList()
 
         binding.apply {
             listAdapter = ApplicationsAdapter {
-                setResult(it)
+                appInfoCallback(it)
             }
 
             list.apply {
                 adapter = listAdapter
-                layoutManager = LinearLayoutManager(requireContext())
+                layoutManager = LinearLayoutManager(context)
             }
 
             filter.addTextChangedListener(object : TextWatcher {
@@ -88,14 +92,10 @@ class ApplicationDialog: DialogFragment() {
 
     }
 
-    fun setResult(appInfo: AppInfo) {
-        // Use the Kotlin extension in the fragment-ktx artifact
-        setFragmentResult(APP_Request_Key, bundleOf(AppInfo_Key to appInfo))
-        dismiss()
-    }
+
 
     fun refreshApps(filter: String?) {
-        viewLifecycleOwner.lifecycleScope.launch (Dispatchers.Default) {
+        scope.launch (Dispatchers.Default) {
             val appInfoList = getAppInfo(filter)
             withContext(Dispatchers.Main) {
                 listAdapter?.submitList(appInfoList)
@@ -112,34 +112,21 @@ class ApplicationDialog: DialogFragment() {
 
 
     fun getApplicationList() : List<ApplicationInfo> {
-        val pm: PackageManager = requireContext().packageManager
+        val pm: PackageManager = context.packageManager
         return pm.getInstalledApplications(PackageManager.GET_META_DATA)
     }
 
     fun getApplicationListResulver(): List<AppInfo> {
-        val pm: PackageManager = requireContext().packageManager
+        val pm: PackageManager = context.packageManager
         val mainIntent = Intent(Intent.ACTION_MAIN, null)
         mainIntent.addCategory(Intent.CATEGORY_LAUNCHER)
-        val pkgAppsList = requireContext().packageManager.queryIntentActivities(mainIntent, 0)
+        val pkgAppsList = context.packageManager.queryIntentActivities(mainIntent, 0)
         return pkgAppsList.map {
             AppInfo(
                 it.loadLabel(pm).toString(),
                 it.activityInfo.packageName,
                 it.loadIcon(pm)
             )
-        }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-    companion object {
-        val APP_Request_Key = "app result key"
-        val AppInfo_Key = "app info key"
-        fun getResult(bundle: Bundle): AppInfo {
-            return bundle.getSerializable(AppInfo_Key) as AppInfo
         }
     }
 }

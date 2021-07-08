@@ -159,7 +159,8 @@ class TaskDetailsFragment : Fragment() {
         openChooseDialog(listOf(
                 "Call" to ActionType.CALL,
                 "Stop" to ActionType.STOP,
-                "Delay" to ActionType.DELAY
+                "Delay" to ActionType.DELAY,
+                "Open App" to ActionType.OPEN_APP
         ), actionType)
     }
 

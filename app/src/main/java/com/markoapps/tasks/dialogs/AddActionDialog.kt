@@ -52,7 +52,7 @@ class AddActivityDialog: DialogFragment() {
                 ActionType.CALL -> ActionModel.CallNumberActionModel(newValues[0].value!!)
                 ActionType.STOP -> ActionModel.CallStopActionModel()
                 ActionType.DELAY -> ActionModel.GeneralDelayActionModel(newValues[0].value!!.toLong() * 1000)
-                else -> ActionModel.GeneralDelayActionModel(0)
+                ActionType.OPEN_APP -> ActionModel.OpenAppActionModel(newValues[0].value!!, newValues[1].value!!)
             }
         }
     }
@@ -72,6 +72,7 @@ class AddActivityDialog: DialogFragment() {
                     ActionType.CALL -> ActionModel.CallNumberActionModel("")
                     ActionType.STOP -> ActionModel.CallStopActionModel()
                     ActionType.DELAY -> ActionModel.GeneralDelayActionModel(0)
+                    ActionType.OPEN_APP -> ActionModel.OpenAppActionModel("default.package", "default.name")
                 }
             )
 
@@ -83,9 +84,15 @@ class AddActivityDialog: DialogFragment() {
     fun onClickKey(position: Int) {
         when(getActionType()) {
             ActionType.CALL -> {
-                ChoosePhoneDialog{
+                ChoosePhoneDialog(requireContext()){
                     itemTaskDetailsEditBinding.actionContainer.setItemValue(it.mobileNumber, position)
-                }.show(parentFragmentManager, null)
+                }.show()
+            }
+            ActionType.OPEN_APP -> {
+                ChooseApplicationDialog(requireContext()){
+                    itemTaskDetailsEditBinding.actionContainer.setItemValue(it.packageName, 0)
+                    itemTaskDetailsEditBinding.actionContainer.setItemValue(it.appName, 1)
+                }.show()
             }
         }
     }
@@ -109,7 +116,7 @@ class AddActivityDialog: DialogFragment() {
 }
 
 enum class ActionType {
-    CALL, STOP, DELAY
+    CALL, STOP, DELAY, OPEN_APP
 }
 
 
@@ -118,5 +125,6 @@ fun ActionModel.toActionType() = when(this) {
     is ActionModel.CallNumberActionModel -> ActionType.CALL
     is ActionModel.CallStopActionModel -> ActionType.STOP
     is ActionModel.GeneralDelayActionModel -> ActionType.DELAY
+    is ActionModel.OpenAppActionModel -> ActionType.OPEN_APP
     else -> ActionType.CALL
 }

@@ -1,8 +1,10 @@
 package com.markoapps.tasks.dialogs
 
+import android.app.Dialog
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
+import android.content.DialogInterface
 import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
@@ -12,6 +14,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
@@ -19,13 +22,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.markoapps.tasks.adapters.PhonesAdapter
 import com.markoapps.tasks.databinding.ChoosePhoneDialogBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.io.Serializable
 
 
-class ChoosePhoneDialog(val phoneInfoCallback: (PhoneInfo) -> Unit): DialogFragment() {
+class ChoosePhoneDialog(context: Context, val phoneInfoCallback: (PhoneInfo) -> Unit): Dialog(context) {
+
+    private val scope = CoroutineScope(Dispatchers.Default)
 
     private var _binding: ChoosePhoneDialogBinding? = null
 
@@ -35,34 +38,35 @@ class ChoosePhoneDialog(val phoneInfoCallback: (PhoneInfo) -> Unit): DialogFragm
 
     private var listAdapter: PhonesAdapter? = null
 
-    private var phoneInfoList: List<PhoneInfo>? = null
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        _binding = ChoosePhoneDialogBinding.inflate(layoutInflater, null, false)
+        setContentView(binding.root)
+        val window = this.window
+        window?.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT)
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        setFullScreen()
+        initViews()
+
+        setOnDismissListener {
+            scope.cancel()
+            _binding = null
+        }
+
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = ChoosePhoneDialogBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    private fun initViews() {
 
         binding.apply {
             listAdapter = PhonesAdapter {
-                setResult(it)
                 phoneInfoCallback(it)
+                dismiss()
             }
 
             list.apply {
                 adapter = listAdapter
-                layoutManager = LinearLayoutManager(requireContext())
+                layoutManager = LinearLayoutManager(context)
             }
 
             filter.addTextChangedListener(object : TextWatcher {
@@ -92,14 +96,8 @@ class ChoosePhoneDialog(val phoneInfoCallback: (PhoneInfo) -> Unit): DialogFragm
 
     }
 
-    fun setResult(phoneInfo: PhoneInfo) {
-        // Use the Kotlin extension in the fragment-ktx artifact
-        setFragmentResult(PHONE_Request_Key, bundleOf(PhoneInfo_Key to phoneInfo))
-        dismiss()
-    }
-
     fun refreshContants(filter: String?) {
-        viewLifecycleOwner.lifecycleScope.launch (Dispatchers.Default) {
+        scope.launch (Dispatchers.Default) {
             val phoneInfoList = getPhoneInfo(filter)
             withContext(Dispatchers.Main) {
                 listAdapter?.submitList(phoneInfoList)
@@ -108,11 +106,16 @@ class ChoosePhoneDialog(val phoneInfoCallback: (PhoneInfo) -> Unit): DialogFragm
     }
 
     fun getPhoneInfo(fillter: String?): List<PhoneInfo> {
-        return getContacts(requireContext()).filter {
+        return getContacts(context).filter {
             it.name.contains(fillter ?: "")
         }
     }
 
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+
+        scope.cancel()
+    }
 
     fun getContacts(ctx: Context): List<PhoneInfo> {
         val list: MutableList<PhoneInfo> = ArrayList()
@@ -163,19 +166,10 @@ class ChoosePhoneDialog(val phoneInfoCallback: (PhoneInfo) -> Unit): DialogFragm
         return list
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
 
-    companion object {
-        val PHONE_Request_Key = "phone result key"
-        val PhoneInfo_Key = "phone info key"
-        fun getResult(bundle: Bundle): PhoneInfo {
-            return bundle.getSerializable(PhoneInfo_Key) as PhoneInfo
-        }
-    }
 }
+
+
 
 data class PhoneInfo(
     val id: String,
