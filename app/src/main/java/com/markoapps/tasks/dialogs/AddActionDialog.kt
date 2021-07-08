@@ -1,6 +1,7 @@
 package com.markoapps.tasks.dialogs
 
 import android.os.Bundle
+import android.telecom.Call
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,8 +26,11 @@ class AddActivityDialog: DialogFragment() {
         return itemTaskDetailsEditBinding.root
     }
 
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
 
         val actionModel: ActionModel? = requireArguments()[ARG_ACTION_KEY] as? ActionModel
         val actionType: ActionType = actionModel?.toActionType() ?:  requireArguments()[ARG_ACTION_TYPE_KEY] as ActionType
@@ -53,6 +57,12 @@ class AddActivityDialog: DialogFragment() {
         }
     }
 
+    fun getActionType(): ActionType {
+        val actionModel: ActionModel? = requireArguments()[ARG_ACTION_KEY] as? ActionModel
+        val actionType: ActionType = actionModel?.toActionType() ?:  requireArguments()[ARG_ACTION_TYPE_KEY] as ActionType
+        return actionType
+    }
+
     fun setAction(actionType: ActionType, actionModel: ActionModel? = null) {
         itemTaskDetailsEditBinding.apply {
             val argsData: TaskDetailUi.Args = actionToTaskDetailUi(
@@ -66,7 +76,17 @@ class AddActivityDialog: DialogFragment() {
             )
 
             title.text = argsData.title
-            actionContainer.setArgs(argsData.list)
+            actionContainer.setArgs(argsData.list, this@AddActivityDialog::onClickKey)
+        }
+    }
+
+    fun onClickKey(position: Int) {
+        when(getActionType()) {
+            ActionType.CALL -> {
+                ChoosePhoneDialog{
+                    itemTaskDetailsEditBinding.actionContainer.setItemValue(it.mobileNumber, position)
+                }.show(parentFragmentManager, null)
+            }
         }
     }
 

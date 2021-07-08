@@ -67,7 +67,9 @@ class AddTriggerDialog: DialogFragment() {
             )
 
             title.text = argsData.title
-            actionContainer.setArgs(argsData.list)
+            actionContainer.setArgs(argsData.list){
+
+            }
         }
     }
 

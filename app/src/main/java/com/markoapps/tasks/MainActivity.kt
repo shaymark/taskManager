@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
 
         requestMultiplePermissionLauncher.launch(
                 arrayOf(
+                        Manifest.permission.READ_CONTACTS,
                         Manifest.permission.ANSWER_PHONE_CALLS,
                         Manifest.permission.CALL_PHONE,
                         Manifest.permission.RECEIVE_SMS,
@@ -65,6 +66,9 @@ class MainActivity : AppCompatActivity() {
         registerForActivityResult(
                 ActivityResultContracts.RequestMultiplePermissions()
         ) { isGranted: Map<String, Boolean> ->
+            if (isGranted[Manifest.permission.READ_CONTACTS] == false) {
+
+            }
             if (isGranted[Manifest.permission.ANSWER_PHONE_CALLS] == false) {
 
             } else {
