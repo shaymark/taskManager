@@ -5,7 +5,7 @@ import androidx.annotation.RequiresApi
 import com.markoapps.taskmanager.managers.CallManager
 import com.markoapps.taskmanager.managers.GeneralManager
 
-class GeneralDelayAction(val delay: Long, val generalManager: GeneralManager): Action(generalManager) {
+class GeneralDelayAction(val delay: Long, val generalManager: GeneralManager, isNotification: Boolean = false): Action(generalManager, isNotification = isNotification) {
 
     @RequiresApi(Build.VERSION_CODES.P)
     override fun startAction() {

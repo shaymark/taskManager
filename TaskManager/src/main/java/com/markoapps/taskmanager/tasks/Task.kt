@@ -1,6 +1,8 @@
 package com.markoapps.taskmanager.tasks
 
+import android.app.NotificationManager
 import com.markoapps.taskmanager.actions.Action
+import com.markoapps.taskmanager.actions.INotification
 import com.markoapps.taskmanager.di.Provider
 import com.markoapps.taskmanager.triggers.Trigger
 import java.util.*
@@ -34,7 +36,11 @@ class Task(var actionList: List<Action?>, var trigger: Trigger? = null, id: Stri
     override fun onTriggerFire(payload: Any?) {
         actionList?.forEach {
             executorService.submit {
-                it?.startAction()
+                if(it?.isNotification == true && it is INotification) {
+                    Provider.notificationManager.sendNotification(it.getTitle(), it.getContent(), it.getPendingIntent())
+                } else {
+                    it?.startAction()
+                }
             }
         }
 

@@ -38,6 +38,8 @@ class ChoosePhoneDialog(context: Context, val phoneInfoCallback: (PhoneInfo) -> 
 
     private var listAdapter: PhonesAdapter? = null
 
+    private var phoneInfoList: List<PhoneInfo>? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ChoosePhoneDialogBinding.inflate(layoutInflater, null, false)
@@ -96,20 +98,19 @@ class ChoosePhoneDialog(context: Context, val phoneInfoCallback: (PhoneInfo) -> 
 
     }
 
+
     fun refreshContants(filter: String?) {
         scope.launch (Dispatchers.Default) {
-            val phoneInfoList = getPhoneInfo(filter)
+            phoneInfoList = phoneInfoList ?: getContacts(context)
+            val filteredPhoneInfoList = phoneInfoList?.filter {
+                it.name.contains(filter ?: "")
+            }
             withContext(Dispatchers.Main) {
-                listAdapter?.submitList(phoneInfoList)
+                listAdapter?.submitList(filteredPhoneInfoList)
             }
         }
     }
 
-    fun getPhoneInfo(fillter: String?): List<PhoneInfo> {
-        return getContacts(context).filter {
-            it.name.contains(fillter ?: "")
-        }
-    }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()

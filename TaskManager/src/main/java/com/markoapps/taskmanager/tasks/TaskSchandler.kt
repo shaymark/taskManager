@@ -56,7 +56,8 @@ private fun actionModelToAction(actionModel: ActionModel): Action {
         )
         is ActionModel.OpenAppActionModel -> OpenAppAction(
             actionModel.packageName,
-            Provider.appManager,
+            actionModel.isNotification,
+            Provider.appManager
         )
     }
 }

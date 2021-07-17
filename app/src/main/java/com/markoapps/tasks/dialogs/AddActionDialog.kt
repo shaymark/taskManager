@@ -1,7 +1,6 @@
 package com.markoapps.tasks.dialogs
 
 import android.os.Bundle
-import android.telecom.Call
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,7 +51,7 @@ class AddActivityDialog: DialogFragment() {
                 ActionType.CALL -> ActionModel.CallNumberActionModel(newValues[0].value!!)
                 ActionType.STOP -> ActionModel.CallStopActionModel()
                 ActionType.DELAY -> ActionModel.GeneralDelayActionModel(newValues[0].value!!.toLong() * 1000)
-                ActionType.OPEN_APP -> ActionModel.OpenAppActionModel(newValues[0].value!!, newValues[1].value!!)
+                ActionType.OPEN_APP -> ActionModel.OpenAppActionModel(newValues[0].value!!, newValues[1].value!!, isNotificationCb.isChecked)
             }
         }
     }
@@ -72,12 +71,30 @@ class AddActivityDialog: DialogFragment() {
                     ActionType.CALL -> ActionModel.CallNumberActionModel("")
                     ActionType.STOP -> ActionModel.CallStopActionModel()
                     ActionType.DELAY -> ActionModel.GeneralDelayActionModel(0)
-                    ActionType.OPEN_APP -> ActionModel.OpenAppActionModel("default.package", "default.name")
+                    ActionType.OPEN_APP -> ActionModel.OpenAppActionModel("default.package", "default.name", false)
                 }
             )
 
             title.text = argsData.title
             actionContainer.setArgs(argsData.list, this@AddActivityDialog::onClickKey)
+            
+            val isNotificationEnabled = when (actionType) {
+                ActionType.CALL -> false
+                ActionType.STOP -> false
+                ActionType.DELAY -> false
+                ActionType.OPEN_APP -> true
+            }
+            
+            val isNotificationActive = when (actionModel) {
+                is ActionModel.CallNumberActionModel -> false
+                is ActionModel.CallStopActionModel -> false
+                is ActionModel.GeneralDelayActionModel -> false
+                is ActionModel.OpenAppActionModel -> actionModel.isNotification
+                null -> false
+            }
+            
+            isNotificationCb.visibility = if(isNotificationEnabled) View.VISIBLE else View.GONE
+            isNotificationCb.isChecked = isNotificationActive
         }
     }
 

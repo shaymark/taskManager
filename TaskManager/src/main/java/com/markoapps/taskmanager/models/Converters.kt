@@ -1,14 +1,9 @@
 package com.markoapps.taskmanager.models
 
 import androidx.room.TypeConverter
-import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.reflect.TypeToken
 import com.markoapps.taskmanager.di.Provider
-import com.markoapps.taskmanager.triggers.SmsFilter
-import com.markoapps.taskmanager.models.ActionModel
-import com.markoapps.taskmanager.models.Condition
-import com.markoapps.taskmanager.models.TriggerModel
 
 
 class Converters {

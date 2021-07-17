@@ -58,6 +58,7 @@ class ChooseApplicationDialog(context: Context, val appInfoCallback: (AppInfo) -
         binding.apply {
             listAdapter = ApplicationsAdapter {
                 appInfoCallback(it)
+                dismiss()
             }
 
             list.apply {

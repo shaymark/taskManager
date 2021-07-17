@@ -34,7 +34,8 @@ sealed class ActionModel(@SerializedName("type") val type: String) : java.io.Ser
     data class OpenAppActionModel(
         @SerializedName("packageName") val packageName: String,
         @SerializedName("appName") val appName: String,
-    ): ActionModel("OpenAppModel")
+        @SerializedName("isNotification") val isNotification: Boolean,
+    ): ActionModel("OpenAppActionModel")
 }
 
 

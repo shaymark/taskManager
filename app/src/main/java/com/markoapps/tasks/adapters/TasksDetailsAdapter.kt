@@ -168,6 +168,7 @@ class TasksDetailsAdapter(val listener: TasksDetailsAdapterListener? = null) : a
             itemTaskDetailsArgsBinding.apply {
                 title.text = argsData.title
 
+                isNotificationTv.visibility = if (argsData.isNotification) View.VISIBLE else View.GONE
 
                 edit.setOnClickListener {
                     when(argsData.type) {

@@ -26,7 +26,8 @@ sealed class TaskDetailUi {
             val title: String,
             val list: List<KeyValuePair>,
             val type: TaskDetailUiArgsType,
-            val actionPosition: Int = 0
+            val actionPosition: Int = 0,
+            val isNotification: Boolean = false
     ) : TaskDetailUi()
 }
 
@@ -65,7 +66,7 @@ fun triggerToTaskDetailUi(triggerModel: TriggerModel): TaskDetailUi.Args = when(
                 KeyValuePair(ChooseType.phone,"sender", triggerModel.smsFilter.sender, null, true),
                 KeyValuePair( ChooseType.string, "contains", triggerModel.smsFilter.content, null, true),
             ),
-            type = TaskDetailUiArgsType.trigger
+            type = TaskDetailUiArgsType.trigger,
         )
     }
 }
@@ -86,7 +87,7 @@ fun actionToTaskDetailUi(actionModel: ActionModel) : TaskDetailUi.Args  = when(a
             id = UUID.randomUUID().toString(),
             title = "hang up call number",
             list = listOf(),
-            type = TaskDetailUiArgsType.action
+            type = TaskDetailUiArgsType.action,
         )
     }
     is ActionModel.GeneralDelayActionModel -> {
@@ -96,7 +97,7 @@ fun actionToTaskDetailUi(actionModel: ActionModel) : TaskDetailUi.Args  = when(a
             list = listOf(
                 KeyValuePair(ChooseType.string,"delay[seconds]", (actionModel.delay / 1000).toString(), null, true),
             ),
-            type = TaskDetailUiArgsType.action
+            type = TaskDetailUiArgsType.action,
         )
     }
     is ActionModel.OpenAppActionModel -> {
@@ -107,7 +108,8 @@ fun actionToTaskDetailUi(actionModel: ActionModel) : TaskDetailUi.Args  = when(a
                 KeyValuePair(ChooseType.string,"app package", actionModel.packageName, null, true),
                 KeyValuePair(ChooseType.string,"app name", actionModel.appName, null, true),
             ),
-            type = TaskDetailUiArgsType.action
+            type = TaskDetailUiArgsType.action,
+            isNotification = actionModel.isNotification
         )
     }
 }

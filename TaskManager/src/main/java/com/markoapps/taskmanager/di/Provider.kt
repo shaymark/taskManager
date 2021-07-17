@@ -4,10 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.google.gson.Gson
 import com.markoapps.taskmanager.actions.ActionFactory
-import com.markoapps.taskmanager.managers.AppManager
-import com.markoapps.taskmanager.managers.CallManager
-import com.markoapps.taskmanager.managers.GeneralManager
-import com.markoapps.taskmanager.managers.SmsManager
+import com.markoapps.taskmanager.managers.*
 import com.markoapps.taskmanager.models.TasksDatabase
 import com.markoapps.taskmanager.tasks.TaskSchandler
 import java.util.concurrent.ExecutorService
@@ -35,6 +32,10 @@ object Provider {
 
     val appManager by lazy {
         AppManager(context.applicationContext)
+    }
+
+    val notificationManager by lazy {
+        NotificationManager(context.applicationContext)
     }
 
     val TaskSchandler by lazy {

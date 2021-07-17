@@ -28,6 +28,15 @@
             android:layout_height="30dp"
             android:src="@drawable/ic_trigger" />
 
+        <CheckBox
+            android:id="@+id/is_notification_cb"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Notification"
+            android:background="@color/white">
+
+        </CheckBox>
+
         <TextView
             android:layout_width="100dp"
             android:background="@color/teal_200"

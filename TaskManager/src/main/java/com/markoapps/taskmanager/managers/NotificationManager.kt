@@ -10,6 +10,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat.startActivity
 import com.markoapps.taskmanager.Configurations
+import com.markoapps.taskmanager.R
 
 
 class NotificationManager(val context: Context) : Manager() {
@@ -38,7 +39,7 @@ class NotificationManager(val context: Context) : Manager() {
     fun sendNotification(title: String, content: String, pendingIntent: PendingIntent?, notificationId: Int? = DEFULT_NOTIFICATION_ID) {
 
         var builder = NotificationCompat.Builder(context, CHANNEL_ID)
-            //.setSmallIcon(R.drawable.lan)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(content)
             .setStyle(

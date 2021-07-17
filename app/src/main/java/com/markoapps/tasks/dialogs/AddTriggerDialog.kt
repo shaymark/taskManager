@@ -70,6 +70,9 @@ class AddTriggerDialog: DialogFragment() {
             actionContainer.setArgs(argsData.list){
 
             }
+            isNotificationCb.visibility = View.GONE
+
+
         }
     }
 

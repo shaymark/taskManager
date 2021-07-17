@@ -20,6 +20,16 @@ class AppManager(val context: Context) : Manager() {
 
     }
 
+    fun openAppPendingIntent(packageName: String): PendingIntent? {
+        val pm: PackageManager = context.packageManager
+        val launchIntent: Intent? = pm.getLaunchIntentForPackage(packageName)
+
+        if(launchIntent != null) {
+            return PendingIntent.getActivity(context, 0, launchIntent, 0)
+        }
+        return null
+    }
+
     fun openApp(packageName: String) {
         val pm: PackageManager = context.packageManager
         val launchIntent: Intent? = pm.getLaunchIntentForPackage(packageName)
