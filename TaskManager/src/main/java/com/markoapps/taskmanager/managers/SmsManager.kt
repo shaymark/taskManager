@@ -15,18 +15,9 @@ data class SmsData(
     val date: Date, val sender: String, val content: String
 )
 
-public class SmsManager: Manager() {
+class SmsManager: Manager() {
 
     val smsListener : IObservable<SmsData> = IObservable()
-
-    fun sendSms() {
-
-    }
-
-    fun getLastSms(): List<SmsData> {
-        return listOf()
-    }
-
 
 }
 
@@ -55,6 +46,5 @@ class SMSBroadcastReceiver : BroadcastReceiver() {
                 Log.v("Debug", str)
             }
         }
-
     }
 }

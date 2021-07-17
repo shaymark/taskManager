@@ -40,6 +40,15 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name="com.markoapps.taskmanager.managers.GeofenceBroadcastReceiver"/>
+
+        <receiver android:name="com.markoapps.taskmanager.managers.BootCompleteReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

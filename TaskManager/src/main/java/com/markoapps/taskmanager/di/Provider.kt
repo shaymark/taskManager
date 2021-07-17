@@ -34,6 +34,10 @@ object Provider {
         AppManager(context.applicationContext)
     }
 
+    val geoFenceManager by lazy {
+        GeoFenceManager(context.applicationContext)
+    }
+
     val notificationManager by lazy {
         NotificationManager(context.applicationContext)
     }
