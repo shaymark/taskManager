@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.markoapps.taskmanager.di.Provider
+import com.markoapps.taskmanager.managers.GeofanceEntry
 import com.markoapps.taskmanager.triggers.SmsFilter
 import com.markoapps.taskmanager.models.*
 import java.util.*
@@ -13,7 +14,7 @@ import java.util.concurrent.Executors
 
 @Database(
     entities = [TaskModel::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -43,7 +44,7 @@ abstract class TasksDatabase : RoomDatabase() {
 
                 Provider.executors.execute {
                     instance?.tasksDao()?.apply {
-                        addTask(task)
+                   //     addTask(task)
                     }
                 }
 
@@ -83,5 +84,33 @@ val DefaultTaskModel =  TaskModel(
                 ActionModel.CallStopActionModel()
         ),
         isActive = true
+)
+
+val GeoTaskModel =  TaskModel(
+    id = UUID.randomUUID().toString(),
+    name = "herzelia geo trigger",
+    trigger = TriggerModel.GEOTriggerType(
+        geofanceEntry = GeofanceEntry(
+            key = "herzeliaGeo1",
+            latitude = 32.1624,
+            longitude = 34.8447,
+            transationType = 0
+        )
+    )
+    ,
+    condition = Condition(),
+    actionList = listOf(
+        ActionModel.ToastActionModel(
+            message = "geo herzelia trigger"
+        ),
+        ActionModel.GeneralDelayActionModel(
+            delay = 20000
+        ),
+        ActionModel.ToastActionModel(
+        message = "geo herzelia trigger 2 seconds"
+        ),
+
+    ),
+    isActive = true
 )
 

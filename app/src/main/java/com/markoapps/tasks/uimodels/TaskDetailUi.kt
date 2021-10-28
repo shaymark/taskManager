@@ -69,6 +69,19 @@ fun triggerToTaskDetailUi(triggerModel: TriggerModel): TaskDetailUi.Args = when(
             type = TaskDetailUiArgsType.trigger,
         )
     }
+    is TriggerModel.GEOTriggerType -> {
+        TaskDetailUi.Args(
+            id = UUID.randomUUID().toString(),
+            title = "default trigger",
+            list = listOf(
+                KeyValuePair(ChooseType.string,"key", triggerModel.geofanceEntry.key, null, true),
+                KeyValuePair( ChooseType.string, "lat", triggerModel.geofanceEntry.latitude.toString(), null, true),
+                KeyValuePair( ChooseType.string, "lon", triggerModel.geofanceEntry.longitude.toString(), null, true),
+            ),
+            type = TaskDetailUiArgsType.trigger,
+        )
+
+    }
 }
 
 fun actionToTaskDetailUi(actionModel: ActionModel) : TaskDetailUi.Args  = when(actionModel) {
@@ -110,6 +123,16 @@ fun actionToTaskDetailUi(actionModel: ActionModel) : TaskDetailUi.Args  = when(a
             ),
             type = TaskDetailUiArgsType.action,
             isNotification = actionModel.isNotification
+        )
+    }
+    is ActionModel.ToastActionModel -> {
+        TaskDetailUi.Args(
+            id = UUID.randomUUID().toString(),
+            title = "show toast",
+            list = listOf(
+                KeyValuePair(ChooseType.string,"message", actionModel.message, null, true),
+            ),
+            type = TaskDetailUiArgsType.action,
         )
     }
 }

@@ -8,14 +8,15 @@ import android.content.Intent
 import android.util.Log
 import com.google.android.gms.location.*
 import com.google.android.gms.location.GeofencingEvent.*
+import com.google.gson.annotations.SerializedName
 import com.markoapps.taskmanager.di.Provider
 import com.markoapps.taskmanager.framework.IObserver
 
 data class GeofanceEntry(
-    val key: String,
-    val latitude : Double,
-    val longitude: Double,
-    val transationType: Int
+    @SerializedName("key")val key: String,
+    @SerializedName("latitude")val latitude : Double,
+    @SerializedName("longitude")val longitude: Double,
+    @SerializedName("transationType")val transationType: Int
 )
 
 class GeoFenceManager(val context: Context) : Manager() {
@@ -45,21 +46,23 @@ class GeoFenceManager(val context: Context) : Manager() {
 class GeoFenceHelper(val context: Context) {
     val geofencingClient = GeofencingClient(context)
 
-    val geofenceList: MutableList<Geofence> = mutableListOf()
+    val geofenceList: MutableMap<String, Geofence> = mutableMapOf()
 
     fun addGeoFence(geofenceEntry: GeofanceEntry){
-
+        geofenceList.put(geofenceEntry.key, getGeofence(geofenceEntry))
+        updateGeoFence()
     }
 
     fun removeGeoFence(geofenceEntry: GeofanceEntry){
+        geofenceList.remove(geofenceEntry.key)
+        geofencingClient.removeGeofences(listOf(geofenceEntry.key))
 
+        updateGeoFence()
     }
 
-    @SuppressLint("MissingPermission")
-    fun initGeofance() {
-        setGeofenceList()
 
-        val getGeofencingRequest = getGeofencingRequest()
+    @SuppressLint("MissingPermission")
+    fun updateGeoFence() {
 
 
         geofencingClient?.addGeofences(getGeofencingRequest(), geofencePendingIntent)?.run {
@@ -75,32 +78,27 @@ class GeoFenceHelper(val context: Context) {
 
     }
 
-    fun setGeofenceList(){
+    fun getGeofence(entry: GeofanceEntry): Geofence {
+        return Geofence.Builder()
 
-        val entry = DEFULT_ENTRY
+            .setRequestId(entry.key)
 
-        geofenceList.add(
-            Geofence.Builder()
-
-                .setRequestId(entry.key)
-
-                .setCircularRegion(
-                    entry.latitude,
-                    entry.longitude,
-                    GEOFENCE_RADIOS
-                )
+            .setCircularRegion(
+                entry.latitude,
+                entry.longitude,
+                GEOFENCE_RADIOS
+            )
 
 
-                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
+            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
 
-                .build())
-
+            .build()
     }
 
     private fun getGeofencingRequest(): GeofencingRequest {
         return GeofencingRequest.Builder().apply {
             setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
-            addGeofences(geofenceList)
+            addGeofences(geofenceList.values.toList())
         }.build()
     }
 

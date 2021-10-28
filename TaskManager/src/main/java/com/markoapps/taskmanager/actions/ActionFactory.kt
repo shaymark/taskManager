@@ -20,4 +20,8 @@ class ActionFactory(
         return GeneralDelayAction(delay, generalManager)
     }
 
+    fun createToastAction(message: String) : GeneralToastAction {
+        return GeneralToastAction(message, generalManager)
+    }
+
 }

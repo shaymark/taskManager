@@ -89,6 +89,7 @@ class AddActivityDialog: DialogFragment() {
                 is ActionModel.CallNumberActionModel -> false
                 is ActionModel.CallStopActionModel -> false
                 is ActionModel.GeneralDelayActionModel -> false
+                is ActionModel.ToastActionModel -> false
                 is ActionModel.OpenAppActionModel -> actionModel.isNotification
                 null -> false
             }

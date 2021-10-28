@@ -7,6 +7,7 @@ import com.markoapps.taskmanager.triggers.Trigger
 import com.markoapps.taskmanager.models.ActionModel
 import com.markoapps.taskmanager.models.TaskModel
 import com.markoapps.taskmanager.models.TriggerModel
+import com.markoapps.taskmanager.triggers.GeoTrigger
 
 class TaskSchandler {
     val tasks: MutableMap<String, Task> = mutableMapOf()
@@ -59,6 +60,10 @@ private fun actionModelToAction(actionModel: ActionModel): Action {
             actionModel.isNotification,
             Provider.appManager
         )
+        is ActionModel.ToastActionModel -> GeneralToastAction(
+            actionModel.message,
+            Provider.generalManager
+        )
     }
 }
 
@@ -68,6 +73,11 @@ private fun triggerModelToTrigger(triggerModel: TriggerModel, task: Task) : Trig
             smsManager = Provider.smsManager,
             task = task,
             filter = triggerModel.smsFilter
+        )
+        is TriggerModel.GEOTriggerType -> GeoTrigger(
+            geoFenceManager = Provider.geoFenceManager,
+            task = task,
+            geofenceEntry = triggerModel.geofanceEntry
         )
     }
 }

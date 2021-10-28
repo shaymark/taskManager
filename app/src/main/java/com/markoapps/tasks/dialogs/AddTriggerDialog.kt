@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
+import com.markoapps.taskmanager.managers.GeofanceEntry
 import com.markoapps.taskmanager.models.ActionModel
 import com.markoapps.taskmanager.models.TriggerModel
 import com.markoapps.taskmanager.triggers.SmsFilter
@@ -63,6 +64,14 @@ class AddTriggerDialog: DialogFragment() {
                 // for new action
                 when (triggerType) {
                     TriggerType.SMS -> TriggerModel.SMSTriggerType(SmsFilter("xxxxxx", "yyyyyyy"))
+                    TriggerType.GEO -> TriggerModel.GEOTriggerType(
+                            geofanceEntry = GeofanceEntry(
+                                key = "herzeliaGeo1",
+                                latitude = 32.1624,
+                                longitude = 34.8447,
+                                transationType = 0
+                            )
+                    )
                 }
             )
 
@@ -96,9 +105,10 @@ class AddTriggerDialog: DialogFragment() {
 
 
 enum class TriggerType {
-    SMS
+    SMS, GEO
 }
 
 fun TriggerModel.toTriggerType() = when(this) {
     is TriggerModel.SMSTriggerType -> TriggerType.SMS
+    is TriggerModel.GEOTriggerType -> TriggerType.GEO
 }

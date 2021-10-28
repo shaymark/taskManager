@@ -16,7 +16,13 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.markoapps.taskmanager.models.DefaultTaskModel
+import com.markoapps.taskmanager.models.GeoTaskModel
 import com.markoapps.taskmanager.models.TaskModel
+import com.markoapps.taskmanager.models.TriggerModel
+import com.markoapps.taskmanager.triggers.GeoTrigger
+import com.markoapps.taskmanager.triggers.SmsTrigger
+import com.markoapps.taskmanager.triggers.Trigger
+import com.markoapps.taskmanager.triggers.TriggerFactory
 import com.markoapps.taskmanager.ui.TaskManagerApi
 import java.util.*
 
@@ -34,6 +40,8 @@ class MainActivity : AppCompatActivity() {
             taskManagerApi.updateOrAddTask(DefaultTaskModel.copy(id = UUID.randomUUID().toString(), isActive = false))
         }
 
+        taskManagerApi.updateOrAddTask(GeoTaskModel.copy(isActive = true))
+
         requestMultiplePermissionLauncher.launch(
                 arrayOf(
                         Manifest.permission.READ_CONTACTS,
@@ -41,7 +49,8 @@ class MainActivity : AppCompatActivity() {
                         Manifest.permission.CALL_PHONE,
                         Manifest.permission.RECEIVE_SMS,
                         Manifest.permission.READ_SMS,
-                        Manifest.permission.SYSTEM_ALERT_WINDOW
+                        Manifest.permission.SYSTEM_ALERT_WINDOW,
+                        Manifest.permission.ACCESS_FINE_LOCATION
                 )
         )
     }
@@ -85,6 +94,12 @@ class MainActivity : AppCompatActivity() {
 
             }
             if (isGranted[Manifest.permission.READ_SMS] == false) {
+
+            } else {
+
+            }
+
+            if (isGranted[Manifest.permission.ACCESS_FINE_LOCATION] == false) {
 
             } else {
 

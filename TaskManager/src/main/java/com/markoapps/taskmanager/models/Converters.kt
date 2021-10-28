@@ -15,7 +15,8 @@ class Converters {
 
             return when (map["type"]) {
                 "SMSTriggerType" ->  Provider.gson.fromJson(string, TriggerModel.SMSTriggerType::class.java)
-                else ->  null
+                "GeoTriggerType" ->  Provider.gson.fromJson(string, TriggerModel.GEOTriggerType::class.java)
+                else -> null
             }
 
     }

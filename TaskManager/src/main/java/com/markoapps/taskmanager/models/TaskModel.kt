@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
+import com.markoapps.taskmanager.managers.GeofanceEntry
 import com.markoapps.taskmanager.triggers.SmsFilter
 
 @Entity(tableName = "tasks")
@@ -36,14 +37,22 @@ sealed class ActionModel(@SerializedName("type") val type: String) : java.io.Ser
         @SerializedName("appName") val appName: String,
         @SerializedName("isNotification") val isNotification: Boolean,
     ): ActionModel("OpenAppActionModel")
+    data class ToastActionModel(
+        @SerializedName("message") val message: String
+    ): ActionModel("ToastActionModel")
 }
 
 
 sealed class TriggerModel  (
     @SerializedName("type") val type: String)  : java.io.Serializable{
+
     data class SMSTriggerType(
         @SerializedName("smsFilter")val smsFilter: SmsFilter) :
         TriggerModel("SMSTriggerType")
+
+    data class GEOTriggerType(
+        @SerializedName("geofanceEntry")val geofanceEntry: GeofanceEntry) :
+        TriggerModel("GEOTriggerType")
 }
 
 enum class NetworkStatus {
