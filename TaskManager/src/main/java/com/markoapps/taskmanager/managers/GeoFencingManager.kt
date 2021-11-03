@@ -16,7 +16,7 @@ data class GeofanceEntry(
     @SerializedName("key")val key: String,
     @SerializedName("latitude")val latitude : Double,
     @SerializedName("longitude")val longitude: Double,
-    @SerializedName("transationType")val transationType: Int
+    @SerializedName("transation_type")val transationType: Int
 )
 
 class GeoFenceManager(val context: Context) : Manager() {
@@ -64,15 +64,18 @@ class GeoFenceHelper(val context: Context) {
     @SuppressLint("MissingPermission")
     fun updateGeoFence() {
 
+        val geofenceRequest = getGeofencingRequest()
 
-        geofencingClient?.addGeofences(getGeofencingRequest(), geofencePendingIntent)?.run {
-            addOnSuccessListener {
-                // Geofences added
-                // ...
-            }
-            addOnFailureListener {
-                // Failed to add geofences
-                // ...
+        if(geofenceRequest != null) {
+            geofencingClient?.addGeofences(getGeofencingRequest(), geofencePendingIntent)?.run {
+                addOnSuccessListener {
+                    // Geofences added
+                    // ...
+                }
+                addOnFailureListener {
+                    // Failed to add geofences
+                    // ...
+                }
             }
         }
 
@@ -88,6 +91,7 @@ class GeoFenceHelper(val context: Context) {
                 entry.longitude,
                 GEOFENCE_RADIOS
             )
+            .setExpirationDuration(1000000)
 
 
             .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
@@ -95,11 +99,13 @@ class GeoFenceHelper(val context: Context) {
             .build()
     }
 
-    private fun getGeofencingRequest(): GeofencingRequest {
-        return GeofencingRequest.Builder().apply {
-            setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
-            addGeofences(geofenceList.values.toList())
-        }.build()
+    private fun getGeofencingRequest(): GeofencingRequest? {
+        return if(geofenceList.values.toList().isNotEmpty()) {
+                 GeofencingRequest.Builder().apply {
+                    setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL)
+                    addGeofences(geofenceList.values.toList())
+                }.build()
+        } else null
     }
 
     private val geofencePendingIntent: PendingIntent by lazy {
